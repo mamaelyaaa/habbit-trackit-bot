@@ -1,10 +1,9 @@
 from pathlib import Path
-from typing import Literal
+from typing import Literal, Union
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import BaseModel
-
+from pydantic import BaseModel, PostgresDsn
 
 load_dotenv()
 
@@ -17,7 +16,7 @@ class AppConfig(BaseModel):
 class RunConfig(BaseModel):
     host: str = "127.0.0.1"
     port: int = 8000
-    mode: Literal["DEV", "TEST", "PROD"]
+    mode: Literal["DEV", "TEST", "PROD"] = "DEV"
 
 
 class FilesConfig(BaseModel):
@@ -33,6 +32,7 @@ class FilesConfig(BaseModel):
 
     # Миграции
     alembic_dir: Path = base_dir / "migrations"
+    alembic_ini: Path = base_dir / "alembic.ini"
 
 
 class LoggerConfig(BaseModel):
@@ -40,9 +40,17 @@ class LoggerConfig(BaseModel):
     format: str = "%(asctime)s - %(name)-16s - %(levelname)-7s - %(message)s"
 
 
+class DBConfig(BaseModel):
+    url: Union[str, PostgresDsn]
+    echo: int = 0
+    pool_size: int = 10
+    max_overflow: int = 10
+
+
 class Settings(BaseSettings):
-    run: RunConfig
     log: LoggerConfig
+    db: DBConfig
+    run: RunConfig = RunConfig()
     app: AppConfig = AppConfig()
     files: FilesConfig = FilesConfig()
 
@@ -53,4 +61,4 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
