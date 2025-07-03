@@ -41,10 +41,20 @@ class LoggerConfig(BaseModel):
 
 
 class DBConfig(BaseModel):
-    url: Union[str, PostgresDsn]
+    # Параметры подключения
+    username: str
+    password: str
+    host: str
+    port: int
+    name: str
+    # Дополнительные настройки
     echo: int = 0
     pool_size: int = 10
     max_overflow: int = 10
+
+    @property
+    def POSTGRES_DSN(self) -> str:
+        return f"postgresql+asyncpg://{self.username}:{self.password}@{self.host}:{self.port}/{self.name}"
 
 
 class Settings(BaseSettings):
