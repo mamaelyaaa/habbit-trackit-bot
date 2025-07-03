@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres
+    container_name: habbit_db
+    environment:
+      POSTGRES_DB: habbits
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  test_db:
+    image: postgres
+    container_name: habbit-test-db
+    environment:
+      POSTGRES_DB: habbit_pytest
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+
+volumes:
+  pgdata:
