@@ -13,7 +13,7 @@ from src.main import app
 async def setup_db():
     # startup
     assert settings.run.mode == "TEST"
-    print(settings.db.url)
+    assert "_pytest" in settings.db.name or "_test" in settings.db.name
 
     yield db_helper.session_getter
 
@@ -26,7 +26,7 @@ async def apply_migrations():
     alembic_cfg = Config(settings.files.alembic_ini)
 
     alembic_cfg.set_main_option("script_location", str(settings.files.alembic_dir))
-    alembic_cfg.set_main_option("sqlalchemy.url", str(settings.db.url))
+    alembic_cfg.set_main_option("sqlalchemy.url", str(settings.db.POSTGRES_DSN))
 
     await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
 
